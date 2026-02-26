@@ -439,14 +439,37 @@ function render(){
     document.getElementById("p2Life").innerText=player2.life;
     document.getElementById("rankDisplay").innerText=playerRating;
 
-    renderPlayer(player1,"p1",1);
-    renderPlayer(player2,"p2",2);
-}
+  function renderPlayer(player, prefix, num){
+    let field=document.getElementById(prefix+"Field");
+    field.innerHTML="";
 
-function renderPlayer(div.innerHTML = `
-<div class="name">${card.name}</div>
-<div class="stats">${card.power} / ${card.health}</div>
-`;
+    player.field.forEach((card,i)=>{
+        let div=document.createElement("div");
+        div.className="card "+card.rank.toLowerCase();
+        div.innerHTML=`
+            <div style="font-size:16px;">${card.name}</div>
+            <div style="margin-top:10px;">⚔ ${card.power}</div>
+            <div>❤ ${card.health}</div>
+        `;
+        if(currentPlayer===num)
+            div.onclick=()=>attack(i);
+        field.appendChild(div);
+    });
+
+    let hand=document.getElementById(prefix+"Hand");
+    hand.innerHTML="";
+    player.hand.forEach((card,i)=>{
+        let div=document.createElement("div");
+        div.className="card "+card.rank.toLowerCase();
+        div.innerHTML=`
+            <div>${card.name}</div>
+            <div>${card.power}/${card.health}</div>
+        `;
+        if(currentPlayer===num)
+            div.onclick=()=>playCard(i);
+        hand.appendChild(div);
+    });
+}
 
 <div style="position:absolute;top:5px;right:10px;font-size:18px;">
 ${card.health}
@@ -473,4 +496,5 @@ render();
 </script>
 </body>
 </html>
+
 
