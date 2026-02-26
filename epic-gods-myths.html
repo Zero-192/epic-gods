@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EPIC: GODS & MYTHS</title>
+<style>
+body {
+    font-family: "Times New Roman", serif;
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+.board {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.player {
+    border: 2px solid gold;
+    padding: 10px;
+    width: 45%;
+    min-height: 400px;
+    background: rgba(255,255,255,0.05);
+}
+
+.card {
+    border: 2px solid white;
+    padding: 6px;
+    margin: 6px;
+    display: inline-block;
+    cursor: pointer;
+    background: #222;
+    width: 120px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.1);
+}
+
+.land { border: 2px solid cyan; }
+
+/* ELEMENT GLOWS */
+.lightning { box-shadow: 0 0 15px #00ccff; }
+.fire { box-shadow: 0 0 15px orange; }
+.death { box-shadow: 0 0 15px purple; }
+.wisdom { box-shadow: 0 0 15px lightblue; }
+.rage { box-shadow: 0 0 15px red; }
+
+/* ULTIMATE MYTHICAL AURA */
+.ultimate {
+    animation: divineAura 2s infinite alternate;
+}
+@keyframes divineAura {
+    from { box-shadow: 0 0 10px gold; }
+    to { box-shadow: 0 0 30px gold; }
+}
+
+/* ATTACK PULSE */
+@keyframes attackPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+.attackAnim { animation: attackPulse 0.3s ease; }
+
+/* SCREEN SHAKE */
+@keyframes shake {
+    0% { transform: translate(0px, 0px); }
+    25% { transform: translate(5px, -5px); }
+    50% { transform: translate(-5px, 5px); }
+    75% { transform: translate(5px, 5px); }
+    100% { transform: translate(0px, 0px); }
+}
+.shake { animation: shake 0.4s; }
+
+/* LIGHTNING STRIKE */
+@keyframes lightningFlash {
+    0% { background: white; }
+    100% { background: transparent; }
+}
+.lightningStrike {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: white;
+    animation: lightningFlash 0.2s ease;
+    pointer-events: none;
+}
+
+/* FIRE EXPLOSION */
+@keyframes fireExplosion {
+    0% { box-shadow: 0 0 0px orange; }
+    50% { box-shadow: 0 0 40px red; }
+    100% { box-shadow: 0 0 0px orange; }
+}
+.fireBlast { animation: fireExplosion 0.5s ease; }
+
+/* DEATH SOUL DRAIN */
+@keyframes soulDrain {
+    0% { background: purple; }
+    100% { background: black; }
+}
+.soul { animation: soulDrain 0.6s ease; }
+
+/* WIN SCREEN */
+#winnerScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: gold;
+    font-size: 50px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 1s forwards;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div id="winnerScreen"></div>
+<h1>EPIC: GODS & MYTHS</h1>
+<h2 id="turnDisplay">Player 1's Turn</h2>
+
+<div class="board">
+    <div class="player">
+        <h3>Player 1</h3>
+        Life: <span id="p1Life">100</span><br>
+        Defense: <span id="p1Defense">0</span>
+        <div class="resourceBox" id="p1Resources"></div>
+        <h4>Field</h4>
+        <div id="p1Field"></div>
+        <h4>Lands</h4>
+        <div id="p1Lands"></div>
+        <h4>Hand</h4>
+        <div id="p1Hand"></div>
+    </div>
+
+    <div class="player">
+        <h3>Player 2</h3>
+        Life: <span id="p2Life">100</span><br>
+        Defense: <span id="p2Defense">0</span>
+        <div class="resourceBox" id="p2Resources"></div>
+        <h4>Field</h4>
+        <div id="p2Field"></div>
+        <h4>Lands</h4>
+        <div id="p2Lands"></div>
+        <h4>Hand</h4>
+        <div id="p2Hand"></div>
+    </div>
+</div>
+
+<button onclick="drawCard()">Draw Card</button>
+<button onclick="endTurn()">End Turn</button>
+
+function attack(index) {
+    let attacker = getPlayer();
+    let defender = getOpponent();
+    let card = attacker.field[index];
+
+    if (!card) return;
+
+    let board = document.body;
+
+    // 🌩 Screen shake for big attacks
+    if (card.power >= 40) {
+        board.classList.add("shake");
+        setTimeout(() => board.classList.remove("shake"), 400);
+    }
+
+    // ⚡ Lightning effect
+    if (card.element === "Lightning") {
+        let flash = document.createElement("div");
+        flash.className = "lightningStrike";
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 200);
+    }
+
+    // 🔥 Fire effect
+    if (card.element === "Fire") {
+        board.classList.add("fireBlast");
+        setTimeout(() => board.classList.remove("fireBlast"), 500);
+    }
+
+    // 💀 Death effect
+    if (card.element === "Death") {
+        board.classList.add("soul");
+        setTimeout(() => board.classList.remove("soul"), 600);
+    }
+
+    // ⚔ Combat Logic
+    if (defender.field.length > 0) {
+        defender.field[0].health -= card.power;
+
+        if (defender.field[0].health <= 0) {
+            defender.field.splice(0, 1);
+        }
+    } else {
+        defender.life -= card.power;
+    }
+
+    checkWin();
+    render();
+}
+
+class Card {
+    constructor(type, name, element, cost, power=0, health=0, rank="Common") {
+        this.type = type; // character or land
+        this.name = name;
+        this.element = element;
+        this.cost = cost;
+        this.power = power;
+        this.health = health;
+        this.rank = rank;
+    }
+}
+
+function createDeck() {
+    return [
+        new Card("land","Lightning Temple","Lightning",0),
+        new Card("land","Fire Shrine","Fire",0),
+        new Card("land","Death Crypt","Death",0),
+
+        new Card("character","Zeus","Lightning",3,50,60,"Mythical"),
+        new Card("character","Thor","Lightning",2,40,50,"Rare"),
+        new Card("character","Ra","Fire",3,45,55,"Mythical"),
+        new Card("character","Anubis","Death",2,35,45,"Rare"),
+        new Card("character","Athena","Wisdom",2,30,60,"Rare"),
+        new Card("character","Minotaur","Rage",1,25,35,"Common")
+    ];
+}
+
+function createPlayer() {
+    return {
+        life: 100,
+        defense: 0,
+        deck: shuffle(createDeck()),
+        hand: [],
+        field: [],
+        lands: [],
+        resources: {},
+        landPlayedThisTurn: false
+    };
+}
+
+let player1 = createPlayer();
+let player2 = createPlayer();
+let currentPlayer = 1;
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function getPlayer() {
+    return currentPlayer === 1 ? player1 : player2;
+}
+
+function getOpponent() {
+    return currentPlayer === 1 ? player2 : player1;
+}
+
+function drawCard() {
+    let player = getPlayer();
+    if (player.deck.length > 0) {
+        player.hand.push(player.deck.pop());
+        render();
+    }
+}
+
+function canPay(player, element, cost) {
+    return (player.resources[element] || 0) >= cost;
+}
+
+function playCard(index) {
+    let player = getPlayer();
+    let card = player.hand[index];
+
+    if (card.type === "land") {
+        if (player.landPlayedThisTurn) return alert("You already played a land this turn!");
+        player.lands.push(card);
+        player.landPlayedThisTurn = true;
+    } else {
+        if (!canPay(player, card.element, card.cost)) {
+            return alert("Not enough " + card.element + "!");
+        }
+        player.resources[card.element] -= card.cost;
+        player.field.push(card);
+    }
+
+    player.hand.splice(index,1);
+    render();
+}
+
+function attack(index) {
+    let attacker = getPlayer();
+    let defender = getOpponent();
+    let card = attacker.field[index];
+
+    if (defender.field.length > 0) {
+        defender.field[0].health -= card.power;
+        if (defender.field[0].health <= 0) {
+            defender.field.splice(0,1);
+        }
+    } else {
+        defender.life -= card.power;
+    }
+
+    render();
+}
+
+function generateResources(player) {
+    player.resources = {};
+    player.lands.forEach(land => {
+        player.resources[land.element] = (player.resources[land.element] || 0) + 1;
+    });
+}
+
+function endTurn() {
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    let player = getPlayer();
+    player.landPlayedThisTurn = false;
+    generateResources(player);
+    document.getElementById("turnDisplay").innerText =
+        currentPlayer === 1 ? "Player 1's Turn" : "Player 2's Turn";
+    render();
+}
+
+function render() {
+    document.getElementById("p1Life").innerText = player1.life;
+    document.getElementById("p2Life").innerText = player2.life;
+
+    renderPlayer(player1,"p1",1);
+    renderPlayer(player2,"p2",2);
+}
+
+function renderPlayer(player,prefix,playerNumber) {
+
+    document.getElementById(prefix+"Resources").innerText =
+        "Resources: " + JSON.stringify(player.resources);
+
+    let handDiv = document.getElementById(prefix+"Hand");
+    handDiv.innerHTML="";
+    if (currentPlayer === playerNumber) {
+        player.hand.forEach((card,i)=>{
+            let div=document.createElement("div");
+            div.className="card";
+            if(card.type==="land") div.classList.add("land");
+            div.innerHTML=`
+                <b>${card.name}</b><br>
+                ${card.rank}<br>
+                ${card.element}<br>
+                Cost: ${card.cost}
+            `;
+            div.onclick=()=>playCard(i);
+            handDiv.appendChild(div);
+        });
+    }
+
+    let fieldDiv=document.getElementById(prefix+"Field");
+    fieldDiv.innerHTML="";
+    player.field.forEach((card,i)=>{
+        let div=document.createElement("div");
+        div.className="card";
+        div.innerHTML=`
+            <b>${card.name}</b><br>
+            ${card.power}/${card.health}
+        `;
+        if(currentPlayer===playerNumber)
+            div.onclick=()=>attack(i);
+        fieldDiv.appendChild(div);
+    });
+
+    let landDiv=document.getElementById(prefix+"Lands");
+    landDiv.innerHTML="";
+    player.lands.forEach(land=>{
+        let div=document.createElement("div");
+        div.className="card land";
+        div.innerHTML=`${land.name}<br>${land.element}`;
+        landDiv.appendChild(div);
+    });
+}
+
+function startGame() {
+    for(let i=0;i<9;i++){
+        player1.hand.push(player1.deck.pop());
+        player2.hand.push(player2.deck.pop());
+    }
+    generateResources(player1);
+    generateResources(player2);
+    render();
+}
+
+startGame();
+
+</script>
+
+</body>
+</html>
