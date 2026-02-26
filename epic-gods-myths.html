@@ -1,16 +1,235 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
 <title>EPIC: GODS & MYTHS</title>
+
 <style>
-body {
+let playerRating = 1000; function saveRank() {
+    localStorage.setItem("epicRank", playerRating);
+}
+
+function loadRank() {
+    let saved = localStorage.getItem("epicRank");
+    if (saved) {
+        playerRating = parseInt(saved);
+    }
+}
+<h3>Rank Rating: <span id="rankDisplay">1000</span></h3>
+/* ================= BODY ================= */
+let customDeck = [];
+
+function openDeckBuilder() {
+    document.getElementById("deckBuilder").style.display = "block";
+    renderDeckBuilder();
+}
+
+function closeDeckBuilder() {
+    document.getElementById("deckBuilder").style.display = "none";
+}
+
+function renderDeckBuilder() {
+
+    let colDiv = document.getElementById("builderCollection");
+    let deckDiv = document.getElementById("builderDeck");
+
+    colDiv.innerHTML = "";
+    deckDiv.innerHTML = "";
+
+    collection.forEach((card,index) => {
+
+        let c = document.createElement("div");
+        c.className = "card";
+        c.innerHTML = `<b>${card.name}</b>`;
+        c.onclick = () => addToDeck(index);
+
+        colDiv.appendChild(c);
+    });
+
+    customDeck.forEach((card,index) => {
+
+        let c = document.createElement("div");
+        c.className = "card";
+        c.innerHTML = `<b>${card.name}</b>`;
+        c.onclick = () => removeFromDeck(index);
+
+        deckDiv.appendChild(c);
+    });
+}
+
+function addToDeck(index) {
+    if (customDeck.length >= 20) return;
+    customDeck.push(collection[index]);
+    renderDeckBuilder();
+}
+
+function removeFromDeck(index) {
+    customDeck.splice(index,1);
+    renderDeckBuilder();
+}
+
+function saveDeck() {
+    player1.deck = shuffle([...customDeck]);
+    alert("Deck Saved!");
+}
+loadCollection();
+body {<audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<button onclick="toggleMusic()">Toggle Music</button>
     font-family: "Times New Roman", serif;
     background: radial-gradient(circle at center, #1a1a1a, #000);
     color: white;
     text-align: center;
-    overflow-x: hidden;
+    margin: 0;
 }
+<button onclick="openCollection()">Collection</button>
+<button onclick="openDeckBuilder()">Deck Builder</button>
+
+<div id="deckBuilder" style="display:none;">
+    <h2>Deck Builder</h2>
+
+    <h3>Available Cards</h3>
+    <div id="builderCollection"></div>
+
+    <h3>Your Deck</h3>
+    <div id="builderDeck"></div>
+
+    <button onclick="saveDeck()">Save Deck</button>
+    <button onclick="closeDeckBuilder()">Close</button>
+</div>
+let customDeck = [];
+
+function openDeckBuilder() {
+    document.getElementById("deckBuilder").style.display = "block";
+    renderDeckBuilder();
+}
+
+function closeDeckBuilder() {
+    document.getElementById("deckBuilder").style.display = "none";
+}
+
+function renderDeckBuilder() {
+
+    let colDiv = document.getElementById("builderCollection");
+    let deckDiv = document.getElementById("builderDeck");
+
+    colDiv.innerHTML = "";
+    deckDiv.innerHTML = "";
+
+    collection.forEach((card,index) => {
+
+        let c = document.createElement("div");
+        c.className = "card";
+        c.innerHTML = `<b>${card.name}</b>`;
+        c.onclick = () => addToDeck(index);
+
+        colDiv.appendChild(c);
+    });
+
+    customDeck.forEach((card,index) => {
+
+        let c = document.createElement("div");
+        c.className = "card";
+        c.innerHTML = `<b>${card.name}</b>`;
+        c.onclick = () => removeFromDeck(index);
+
+        deckDiv.appendChild(c);
+    });
+}
+
+function addToDeck(index) {
+    if (customDeck.length >= 20) return;
+    customDeck.push(collection[index]);
+    renderDeckBuilder();
+}
+
+function removeFromDeck(index) {
+    customDeck.splice(index,1);
+    renderDeckBuilder();
+}
+
+function saveDeck() {
+    player1.deck = shuffle([...customDeck]);
+    alert("Deck Saved!");
+}
+
+<div id="collectionScreen" style="display:none;">
+    <h2>Your Collection</h2>
+    <div id="collectionCards"></div>
+    <button onclick="closeCollection()">Close</button>
+</div>
+function openCollection() {
+    document.getElementById("collectionScreen").style.display = "block";
+    renderCollection();
+}
+
+function closeCollection() {
+    document.getElementById("collectionScreen").style.display = "none";
+}
+
+function renderCollection() {
+    let div = document.getElementById("collectionCards");
+    div.innerHTML = "";
+
+    collection.forEach(card => {
+        let c = document.createElement("div");
+        c.className = "card";
+
+        c.innerHTML = `
+            ${card.art ? `<img src="${card.art}">` : ""}
+            <b>${card.name}</b><br>
+            ${card.power}/${card.health}
+        `;
+
+        div.appendChild(c);
+    });
+}
+<button onclick="openPack()">Open Card Pack</button> 
+<div id="packScreen" style="display:none;">
+    <h2>Opening Pack...</h2>
+    <div id="packCards"></div>
+    <button onclick="closePack()">Close</button>
+</div>
+function openPack() {
+
+    document.getElementById("packScreen").style.display = "block";
+
+    let packDiv = document.getElementById("packCards");
+    packDiv.innerHTML = "";
+
+    let pool = createDeck();
+
+    for (let i = 0; i < 5; i++) {
+
+        let randomCard = pool[Math.floor(Math.random() * pool.length)];
+
+        collection.push(randomCard);
+
+        let div = document.createElement("div");
+        div.className = "card flip";
+
+        if(randomCard.rank === "Rare") div.classList.add("rare");
+        if(randomCard.rank === "Mythical") div.classList.add("mythical");
+
+        div.innerHTML = `
+            ${randomCard.art ? `<img src="${randomCard.art}">` : ""}
+            <b>${randomCard.name}</b><br>
+            ${randomCard.power}/${randomCard.health}
+        `;
+
+        packDiv.appendChild(div);
+    }
+
+    saveCollection();
+}
+
+function closePack() {
+    document.getElementById("packScreen").style.display = "none";
+}
+/* ================= BOARD ================= */
 
 .board {
     display: flex;
@@ -26,14 +245,18 @@ body {
     background: rgba(255,255,255,0.05);
 }
 
+/* ================= CARDS ================= */
+
 .card {
     border: 2px solid white;
     padding: 6px;
     margin: 6px;
     display: inline-block;
     cursor: pointer;
-    background: #222;
-    width: 120px;
+    background: linear-gradient(to bottom, #222, #111);
+    width: 130px;
+    border-radius: 10px;
+    overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -41,74 +264,36 @@ body {
     transform: scale(1.1);
 }
 
+.card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-bottom: 1px solid gold;
+    margin-bottom: 5px;
+}
+
 .land { border: 2px solid cyan; }
 
-/* ELEMENT GLOWS */
-.lightning { box-shadow: 0 0 15px #00ccff; }
-.fire { box-shadow: 0 0 15px orange; }
-.death { box-shadow: 0 0 15px purple; }
-.wisdom { box-shadow: 0 0 15px lightblue; }
-.rage { box-shadow: 0 0 15px red; }
-
-/* ULTIMATE MYTHICAL AURA */
+/* Mythical glow */
 .ultimate {
     animation: divineAura 2s infinite alternate;
 }
+
 @keyframes divineAura {
     from { box-shadow: 0 0 10px gold; }
     to { box-shadow: 0 0 30px gold; }
 }
 
-/* ATTACK PULSE */
+/* Attack animation */
 @keyframes attackPulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
 }
+
 .attackAnim { animation: attackPulse 0.3s ease; }
 
-/* SCREEN SHAKE */
-@keyframes shake {
-    0% { transform: translate(0px, 0px); }
-    25% { transform: translate(5px, -5px); }
-    50% { transform: translate(-5px, 5px); }
-    75% { transform: translate(5px, 5px); }
-    100% { transform: translate(0px, 0px); }
-}
-.shake { animation: shake 0.4s; }
-
-/* LIGHTNING STRIKE */
-@keyframes lightningFlash {
-    0% { background: white; }
-    100% { background: transparent; }
-}
-.lightningStrike {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: white;
-    animation: lightningFlash 0.2s ease;
-    pointer-events: none;
-}
-
-/* FIRE EXPLOSION */
-@keyframes fireExplosion {
-    0% { box-shadow: 0 0 0px orange; }
-    50% { box-shadow: 0 0 40px red; }
-    100% { box-shadow: 0 0 0px orange; }
-}
-.fireBlast { animation: fireExplosion 0.5s ease; }
-
-/* DEATH SOUL DRAIN */
-@keyframes soulDrain {
-    0% { background: purple; }
-    100% { background: black; }
-}
-.soul { animation: soulDrain 0.6s ease; }
-
-/* WIN SCREEN */
+/* Winner Screen */
 #winnerScreen {
     position: fixed;
     top: 0;
@@ -121,147 +306,127 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
-    animation: fadeIn 1s forwards;
 }
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+/* ================= RARITY BORDERS ================= */
+
+.common {
+    border: 2px solid white;
 }
-</style>
+
+.rare {
+    border: 2px solid blue;
+    box-shadow: 0 0 10px blue;
+}
+
+.mythical {
+    border: 2px solid gold;
+    box-shadow: 0 0 15px gold;
+}
+<//* ================= HEALTH BARS ================= */
+
+.healthContainer {
+    width: 100%;
+    height: 20px;
+    background: #333;
+    border: 2px solid gold;
+    margin-bottom: 5px;
+}
+
+.healthBar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, red, orange);
+    transition: width 0.5s ease;
+}>
 </head>
+
 <body>
+
 <div id="winnerScreen"></div>
+
 <h1>EPIC: GODS & MYTHS</h1>
 <h2 id="turnDisplay">Player 1's Turn</h2>
 
 <div class="board">
+
     <div class="player">
         <h3>Player 1</h3>
-        Life: <span id="p1Life">100</span><br>
-        Defense: <span id="p1Defense">0</span>
-        <div class="resourceBox" id="p1Resources"></div>
-        <h4>Field</h4>
+        Life: <span id="p1Life">100</span>
         <div id="p1Field"></div>
-        <h4>Lands</h4>
-        <div id="p1Lands"></div>
-        <h4>Hand</h4>
         <div id="p1Hand"></div>
     </div>
 
     <div class="player">
         <h3>Player 2</h3>
-        Life: <span id="p2Life">100</span><br>
-        Defense: <span id="p2Defense">0</span>
-        <div class="resourceBox" id="p2Resources"></div>
-        <h4>Field</h4>
+        Life: <span id="p2Life">100</span>
         <div id="p2Field"></div>
-        <h4>Lands</h4>
-        <div id="p2Lands"></div>
-        <h4>Hand</h4>
         <div id="p2Hand"></div>
     </div>
+
 </div>
 
-<button onclick="drawCard()">Draw Card</button>
+<button onclick="drawCard()">Draw</button>
 <button onclick="endTurn()">End Turn</button>
 
-function attack(index) {
-    let attacker = getPlayer();
-    let defender = getOpponent();
-    let card = attacker.field[index];
+<script>
 
-    if (!card) return;
-
-    let board = document.body;
-
-    // 🌩 Screen shake for big attacks
-    if (card.power >= 40) {
-        board.classList.add("shake");
-        setTimeout(() => board.classList.remove("shake"), 400);
-    }
-
-    // ⚡ Lightning effect
-    if (card.element === "Lightning") {
-        let flash = document.createElement("div");
-        flash.className = "lightningStrike";
-        document.body.appendChild(flash);
-        setTimeout(() => flash.remove(), 200);
-    }
-
-    // 🔥 Fire effect
-    if (card.element === "Fire") {
-        board.classList.add("fireBlast");
-        setTimeout(() => board.classList.remove("fireBlast"), 500);
-    }
-
-    // 💀 Death effect
-    if (card.element === "Death") {
-        board.classList.add("soul");
-        setTimeout(() => board.classList.remove("soul"), 600);
-    }
-
-    // ⚔ Combat Logic
-    if (defender.field.length > 0) {
-        defender.field[0].health -= card.power;
-
-        if (defender.field[0].health <= 0) {
-            defender.field.splice(0, 1);
-        }
-    } else {
-        defender.life -= card.power;
-    }
-
-    checkWin();
-    render();
-}
+/* ================= CARD ================= */
 
 class Card {
-    constructor(type, name, element, cost, power=0, health=0, rank="Common") {
-        this.type = type; // character or land
+    constructor(name, power, health, art="", rank="Common") {
         this.name = name;
-        this.element = element;
-        this.cost = cost;
         this.power = power;
         this.health = health;
+        this.art = art;
         this.rank = rank;
+        this.hasAttacked = false;
     }
 }
 
-function createDeck() {
-    return [
-        new Card("land","Lightning Temple","Lightning",0),
-        new Card("land","Fire Shrine","Fire",0),
-        new Card("land","Death Crypt","Death",0),
+/* ================= GAME STATE ================= */
 
-        new Card("character","Zeus","Lightning",3,50,60,"Mythical"),
-        new Card("character","Thor","Lightning",2,40,50,"Rare"),
-        new Card("character","Ra","Fire",3,45,55,"Mythical"),
-        new Card("character","Anubis","Death",2,35,45,"Rare"),
-        new Card("character","Athena","Wisdom",2,30,60,"Rare"),
-        new Card("character","Minotaur","Rage",1,25,35,"Common")
-    ];
-}
+let player1 = {
+  <div class="healthContainer">
+    <div id="p1HealthBar" class="healthBar"></div>
+</div>
+<span id="p1Life">100</span> HP
+    deck: [],
+    hand: [],
+    field: []
+};
 
-function createPlayer() {
-    return {
-        life: 100,
-        defense: 0,
-        deck: shuffle(createDeck()),
-        hand: [],
-        field: [],
-        lands: [],
-        resources: {},
-        landPlayedThisTurn: false
-    };
-}
+let player2 = {
+ <div class="healthContainer">
+    <div id="p1HealthBar" class="healthBar"></div>
+</div>
+<span id="p1Life">100</span> HP
+    deck: [],
+    hand: [],
+    field: []
+};
 
-let player1 = createPlayer();
-let player2 = createPlayer();
 let currentPlayer = 1;
+
+/* ================= SETUP ================= */
+
+function createDeck() {
+    return shuffle([
+        new Card("Zeus", 50, 60, "https://picsum.photos/200?1", "Mythical"),
+        new Card("Thor", 40, 50, "https://picsum.photos/200?2"),
+        new Card("Ra", 45, 55, "https://picsum.photos/200?3"),
+        new Card("Anubis", 35, 45, "https://picsum.photos/200?4"),
+        new Card("Athena", 30, 60, "https://picsum.photos/200?5")
+    ]);
+}
 
 function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
 }
+
+player1.deck = createDeck(); let collection = []; collection = createDeck(); // copy full card pool
+player2.deck = createDeck(); let collection = []; collection = createDeck(); // copy full card pool
+
+/* ================= HELPERS ================= */
 
 function getPlayer() {
     return currentPlayer === 1 ? player1 : player2;
@@ -271,6 +436,8 @@ function getOpponent() {
     return currentPlayer === 1 ? player2 : player1;
 }
 
+/* ================= ACTIONS ================= */
+
 function drawCard() {
     let player = getPlayer();
     if (player.deck.length > 0) {
@@ -279,130 +446,249 @@ function drawCard() {
     }
 }
 
-function canPay(player, element, cost) {
-    return (player.resources[element] || 0) >= cost;
+function attack(index) {
+    let player = getPlayer();
+    let opponent = getOpponent();
+    let card = player.field[index];
+
+    if (!card || card.hasAttacked) return;
+
+    card.hasAttacked = true;
+
+    if (opponent.field.length > 0) {
+        opponent.field[0].health -= card.power;
+        if (opponent.field[0].health <= 0) {
+            opponent.field.shift();
+        }
+    } else {
+        opponent.life -= card.power;
+    }
+
+    checkWin(); function checkWin() {
+
+    if (player1.life <= 0) {
+        adjustRank(false);
+        showWinner("AI WINS!");
+    }
+
+    if (player2.life <= 0) {
+        adjustRank(true);
+        showWinner("YOU WIN!");
+    }
+}
+function adjustRank(won) {
+
+    if (won) {
+        playerRating += 25;
+    } else {
+        playerRating -= 20;
+    }
+
+    if (playerRating < 0) playerRating = 0;
+
+    document.getElementById("rankDisplay").innerText = playerRating;
+    saveRank();
+}
+    render(document.getElementById("rankDisplay").innerText = playerRating;);
 }
 
 function playCard(index) {
     let player = getPlayer();
     let card = player.hand[index];
 
-    if (card.type === "land") {
-        if (player.landPlayedThisTurn) return alert("You already played a land this turn!");
-        player.lands.push(card);
-        player.landPlayedThisTurn = true;
-    } else {
-        if (!canPay(player, card.element, card.cost)) {
-            return alert("Not enough " + card.element + "!");
-        }
-        player.resources[card.element] -= card.cost;
-        player.field.push(card);
-    }
-
+    player.field.push(card);
+setTimeout(() => {
+    let fieldDiv = document.getElementById(
+        (currentPlayer === 1 ? "p1" : "p2") + "Field"
+    );
+    let lastCard = fieldDiv.lastChild;
+    if(lastCard) lastCard.classList.add("flip");
+}, 50);
     player.hand.splice(index,1);
     render();
 }
+/* ================= CARD FLIP ================= */
 
-function attack(index) {
-    let attacker = getPlayer();
-    let defender = getOpponent();
-    let card = attacker.field[index];
+.card {
+    perspective: 1000px;
+}
 
-    if (defender.field.length > 0) {
-        defender.field[0].health -= card.power;
-        if (defender.field[0].health <= 0) {
-            defender.field.splice(0,1);
-        }
-    } else {
-        defender.life -= card.power;
+.flip {
+    animation: flipCard 0.6s ease;
+}
+
+@keyframes flipCard {
+    0% { transform: rotateY(90deg); }
+    100% { transform: rotateY(0deg); }
+}
+function function endTurn() {
+
+    // Reset attack flags
+    getPlayer().field.forEach(card => card.hasAttacked = false);
+
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+
+    document.getElementById("turnDisplay").innerText =
+        currentPlayer === 1 ? "Player 1's Turn" : "AI's Turn";
+
+    render();
+
+    // If AI turn, trigger AI
+    if (currentPlayer === 2) {
+        setTimeout(aiTurn, 1000);
+    }
+} {
+
+    getPlayer().field.forEach(card => card.hasAttacked = false);
+
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+
+    document.getElementById("turnDisplay").innerText =
+        currentPlayer === 1 ? "Player 1's Turn" : "Player 2's Turn";
+function aiTurn() {
+
+    let ai = player2;
+
+    // 1️⃣ Draw
+    if (ai.deck.length > 0) {
+        ai.hand.push(ai.deck.pop());
     }
 
     render();
-}
 
-function generateResources(player) {
-    player.resources = {};
-    player.lands.forEach(land => {
-        player.resources[land.element] = (player.resources[land.element] || 0) + 1;
-    });
-}
+    // 2️⃣ Play strongest card
+    if (ai.hand.length > 0) {
 
-function endTurn() {
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
-    let player = getPlayer();
-    player.landPlayedThisTurn = false;
-    generateResources(player);
-    document.getElementById("turnDisplay").innerText =
-        currentPlayer === 1 ? "Player 1's Turn" : "Player 2's Turn";
+        // Sort by power descending
+        ai.hand.sort((a,b) => b.power - a.power);
+
+        let card = ai.hand[0];
+
+        ai.field.push(card);
+        ai.hand.shift();
+
+        render();
+    }
+
+    // 3️⃣ Attack with all creatures
+    setTimeout(() => {
+
+        ai.field.forEach(card => {
+
+            if (!card.hasAttacked) {
+
+                if (player1.field.length > 0) {
+                    player1.field[0].health -= card.power;
+
+                    if (player1.field[0].health <= 0) {
+                        player1.field.shift();
+                    }
+
+                } else {
+                    player1.life -= card.power;
+                }
+
+                card.hasAttacked = true;
+            }
+
+        });
+
+        checkWin();
+        render();
+
+        // 4️⃣ End AI turn
+        setTimeout(() => {
+            endTurn();
+        }, 1000);
+
+    }, 1000);
+}
     render();
 }
 
+/* ================= WIN ================= */
+
+function checkWin() {
+    if (player1.life <= 0) showWinner("PLAYER 2 WINS!");
+    if (player2.life <= 0) showWinner("PLAYER 1 WINS!");
+}
+
+function showWinner(text) {
+    let screen = document.getElementById("winnerScreen");
+    screen.innerText = text;
+    screen.style.display = "flex";
+}
+
+/* ================= RENDER ================= */
+
 function render() {
+
     document.getElementById("p1Life").innerText = player1.life;
     document.getElementById("p2Life").innerText = player2.life;
 
-    renderPlayer(player1,"p1",1);
-    renderPlayer(player2,"p2",2);
+    renderPlayer(player1, "p1", 1);
+    renderPlayer(player2, "p2", 2);
 }
 
-function renderPlayer(player,prefix,playerNumber) {
-
-    document.getElementById(prefix+"Resources").innerText =
-        "Resources: " + JSON.stringify(player.resources);
+function renderPlayer(player, prefix, number) {
 
     let handDiv = document.getElementById(prefix+"Hand");
-    handDiv.innerHTML="";
-    if (currentPlayer === playerNumber) {
+    handDiv.innerHTML = "";
+
+    if (currentPlayer === number) {
         player.hand.forEach((card,i)=>{
-            let div=document.createElement("div");
-            div.className="card";
-            if(card.type==="land") div.classList.add("land");
-            div.innerHTML=`
+            let div = document.createElement("div");
+         div.className = "card";
+
+if(card.rank === "Common") div.classList.add("common");
+if(card.rank === "Rare") div.classList.add("rare");
+if(card.rank === "Mythical") div.classList.add("mythical");
+            div.innerHTML = `
+                ${card.art ? `<img src="${card.art}">` : ""}
                 <b>${card.name}</b><br>
-                ${card.rank}<br>
-                ${card.element}<br>
-                Cost: ${card.cost}
+                ${card.power}/${card.health}
             `;
-            div.onclick=()=>playCard(i);
+            div.onclick = () => playCard(i);
             handDiv.appendChild(div);
         });
     }
 
-    let fieldDiv=document.getElementById(prefix+"Field");
-    fieldDiv.innerHTML="";
+    let fieldDiv = document.getElementById(prefix+"Field");
+    fieldDiv.innerHTML = "";
+
     player.field.forEach((card,i)=>{
-        let div=document.createElement("div");
-        div.className="card";
-        div.innerHTML=`
+        let div = document.createElement("div");
+        div.className = "card";
+        if(card.rank==="Mythical") div.classList.add("ultimate");
+
+        div.innerHTML = `
+            ${card.art ? `<img src="${card.art}">` : ""}
             <b>${card.name}</b><br>
             ${card.power}/${card.health}
         `;
-        if(currentPlayer===playerNumber)
-            div.onclick=()=>attack(i);
+
+        if(currentPlayer === number)
+            div.onclick = () => attack(i);
+
         fieldDiv.appendChild(div);
     });
-
-    let landDiv=document.getElementById(prefix+"Lands");
-    landDiv.innerHTML="";
-    player.lands.forEach(land=>{
-        let div=document.createElement("div");
-        div.className="card land";
-        div.innerHTML=`${land.name}<br>${land.element}`;
-        landDiv.appendChild(div);
-    });
 }
 
-function startGame() {
-    for(let i=0;i<9;i++){
-        player1.hand.push(player1.deck.pop());
-        player2.hand.push(player2.deck.pop());
-    }
-    generateResources(player1);
-    generateResources(player2);
-    render();
+/* ================= START ================= */
+
+for(let i=0;i<3;i++){
+    player1.hand.push(player1.deck.pop());
+    player2.hand.push(player2.deck.pop());
 }
 
-startGame();
+render(updateHealthBars();); unction updateHealthBars() {
+
+    let p1Percent = (player1.life / 100) * 100;
+    let p2Percent = (player2.life / 100) * 100;
+
+    document.getElementById("p1HealthBar").style.width = p1Percent + "%";
+    document.getElementById("p2HealthBar").style.width = p2Percent + "%";
+}
 
 </script>
 
