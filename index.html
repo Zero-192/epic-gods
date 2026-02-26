@@ -5,6 +5,241 @@
 <title>EPIC: GODS & MYTHS</title>
 
 <style>
+    .mythical {
+    border: 2px solid gold;
+    box-shadow: 0 0 30px gold;
+    animation: mythPulse 2s infinite alternate;
+}
+
+@keyframes mythPulse {
+    from { box-shadow: 0 0 15px gold; }
+    to { box-shadow: 0 0 40px orange; }
+}
+/* ELEMENT BACKGROUNDS */
+
+.lightning {
+    background: radial-gradient(circle at center, #5dade2, #1f618d);
+}
+
+.storm {
+    background: radial-gradient(circle at center, #85929e, #2c3e50);
+}
+
+.sun {
+    background: radial-gradient(circle at center, gold, darkorange);
+}
+
+.shadow {
+    background: radial-gradient(circle at center, #5b2c6f, black);
+}
+
+.wisdom {
+    background: radial-gradient(circle at center, #48c9b0, #0e6655);
+}
+/* ===== GLOBAL ===== */
+
+body {
+    font-family: "Trebuchet MS", sans-serif;
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f1a);
+    color: white;
+    text-align: center;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* Animated stars background */
+body::before {
+    content: "";
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    background: repeating-radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 2px);
+    animation: moveStars 60s linear infinite;
+    z-index: -1;
+}
+
+@keyframes moveStars {
+    from { transform: translate(0,0); }
+    to { transform: translate(-500px,-500px); }
+}
+
+h1 {
+    font-size: 42px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px gold;
+}
+
+h3 {
+    margin: 5px;
+}
+.card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 60%);
+    animation: rotateAura 6s linear infinite;
+}
+
+@keyframes rotateAura {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+    .mythical {
+    border: 2px solid gold;
+    box-shadow: 0 0 30px gold;
+    animation: mythPulse 2s infinite alternate;
+}
+
+@keyframes mythPulse {
+    from { box-shadow: 0 0 15px gold; }
+    to { box-shadow: 0 0 40px orange; }
+}
+/* ===== BOARD ===== */
+
+.board {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.player {
+    border: 2px solid gold;
+    padding: 15px;
+    width: 45%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(6px);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,215,0,0.3);
+}
+
+/* ===== BUTTONS ===== */
+
+button {
+    background: linear-gradient(to bottom, gold, orange);
+    border: none;
+    padding: 10px 20px;
+    margin: 8px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px gold;
+}
+
+/* ===== CARDS ===== */
+
+.card {
+    position: relative;
+    border: 2px solid white;
+    padding: 8px;
+    margin: 8px;
+    display: inline-block;
+    cursor: pointer;
+    width: 150px;
+    height: 200px;
+    border-radius: 15px;
+    overflow: hidden;
+    color: white;
+    font-weight: bold;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.05);
+}
+class Card {
+    constructor(name, power, health, rank="Common", element="lightning"){
+        this.name=name;
+        this.power=power;
+        this.health=health;
+        this.rank=rank;
+        this.element=element;
+        this.hasAttacked=false;
+    }
+}
+    border: 2px solid white;
+    padding: 8px;
+    margin: 6px;
+    display: inline-block;
+    cursor: pointer;
+    background: linear-gradient(to bottom, #222, #111);
+    width: 130px;
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(255,255,255,0.2);
+}
+
+/* ===== RARITY ===== */
+
+.common {
+    border: 2px solid #ccc;
+}
+
+.rare {
+    border: 2px solid #3498db;
+    box-shadow: 0 0 15px #3498db;
+}
+
+.mythical {
+    border: 2px solid gold;
+    box-shadow: 0 0 25px gold;
+    animation: mythGlow 2s infinite alternate;
+}
+
+@keyframes mythGlow {
+    from { box-shadow: 0 0 10px gold; }
+    to { box-shadow: 0 0 30px orange; }
+}
+
+/* ===== ATTACK ANIMATION ===== */
+
+@keyframes attackPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+
+.attackAnim {
+    animation: attackPulse 0.4s ease;
+}
+
+/* ===== WIN SCREEN ===== */
+
+#winnerScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    color: gold;
+    font-size: 60px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 0 0 20px gold;
+}
+
+/* ===== RANK DISPLAY ===== */
+
+#rankDisplay {
+    color: gold;
+    font-weight: bold;
+    text-shadow: 0 0 10px gold;
+}
+
+</style>
 body {
     font-family: Arial;
     background: #111;
@@ -101,14 +336,13 @@ let currentPlayer=1;
 
 function createDeck(){
     return shuffle([
-        new Card("Zeus",50,60,"Mythical"),
-        new Card("Thor",40,50,"Rare"),
-        new Card("Ra",45,55),
-        new Card("Anubis",35,45),
-        new Card("Athena",30,60)
+        new Card("Zeus",50,60,"Mythical","lightning"),
+        new Card("Thor",40,50,"Rare","storm"),
+        new Card("Ra",45,55,"Rare","sun"),
+        new Card("Anubis",35,45,"Common","shadow"),
+        new Card("Athena",30,60,"Common","wisdom")
     ]);
 }
-
 function shuffle(a){return a.sort(()=>Math.random()-0.5);}
 
 player1.deck=createDeck();
@@ -209,18 +443,19 @@ function render(){
     renderPlayer(player2,"p2",2);
 }
 
-function renderPlayer(player,prefix,num){
-    let hand=document.getElementById(prefix+"Hand");
-    hand.innerHTML="";
-    if(currentPlayer===num){
-        player.hand.forEach((card,i)=>{
-            let div=document.createElement("div");
-            div.className="card "+card.rank.toLowerCase();
-            div.innerHTML=`<b>${card.name}</b><br>${card.power}/${card.health}`;
-            div.onclick=()=>playCard(i);
-            hand.appendChild(div);
-        });
-    }
+function renderPlayer(div.innerHTML = `
+<div class="name">${card.name}</div>
+<div class="stats">${card.power} / ${card.health}</div>
+`;
+
+<div style="position:absolute;top:5px;right:10px;font-size:18px;">
+${card.health}
+</div>
+
+<div style="position:absolute;bottom:10px;width:100%;text-align:center;font-size:16px;">
+${card.name}
+</div>
+`;
 
     let field=document.getElementById(prefix+"Field");
     field.innerHTML="";
@@ -233,8 +468,9 @@ function renderPlayer(player,prefix,num){
         field.appendChild(div);
     });
 }
-
+div.className="card "+card.rank.toLowerCase()+" "+card.element;
 render();
 </script>
 </body>
 </html>
+
